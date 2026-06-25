@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lava Hook Testes - JSON Webhook Testing Client</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="favicon.png">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Histórico -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>Histórico</h2>
+                <button class="btn-clear-history" id="clearHistoryBtn" title="Limpar Histórico">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
+                </button>
+            </div>
+            <div class="history-list" id="historyList">
+                <div class="empty-history">Nenhum envio recente</div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="app-header">
+                <div class="logo-area">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                    </div>
+                    <h1>Lava Hook Testes</h1>
+                </div>
+                
+                <div class="webhook-info-card">
+                    <span class="info-label">Webhook URL:</span>
+                    <input type="text" id="webhookUrlInput" placeholder="Cole sua URL do Webhook do n8n aqui..." class="webhook-input" spellcheck="false">
+                </div>
+
+                <div class="header-actions">
+                    <button class="btn-secondary" id="toggleHistoryBtn">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                        <span>Histórico</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="workspace-grid">
+                <!-- Editor Panel -->
+                <section class="panel editor-panel">
+                    <div class="panel-header">
+                        <div class="panel-title-group">
+                            <span class="panel-icon">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
+                            </span>
+                            <h3>Payload JSON</h3>
+                        </div>
+                        <div class="panel-actions">
+                            <select id="templateSelector" class="select-template">
+                                <option value="" disabled selected>Templates...</option>
+                                <optgroup label="Padrão">
+                                    <option value="simple">Objeto Simples</option>
+                                    <option value="user">Cadastro de Usuário</option>
+                                    <option value="lead">Conversão de Lead</option>
+                                    <option value="n8n">Estrutura n8n</option>
+                                </optgroup>
+                                <optgroup label="Meus Templates" id="customTemplatesGroup">
+                                    <!-- Custom templates will be rendered here -->
+                                </optgroup>
+                            </select>
+                            <button class="btn-icon" id="saveTemplateBtn" title="Salvar como novo Template">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                            </button>
+                            <button class="btn-icon" id="formatBtn" title="Formatar JSON (Prettify)">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-2-2h-5M3 8v8a2 2 0 0 0 2 2h5M10 12h4"/></svg>
+                            </button>
+                            <button class="btn-icon" id="minifyBtn" title="Minificar JSON">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M10 14l-7 7"/></svg>
+                            </button>
+                            <button class="btn-icon text-danger" id="clearBtn" title="Limpar tudo">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="editor-container">
+                        <div class="line-numbers" id="lineNumbers">1</div>
+                        <textarea id="jsonInput" spellcheck="false" placeholder='{\n  "mensagem": "Digite seu JSON aqui ou selecione um template acima"\n}'></textarea>
+                    </div>
+
+                    <div class="validation-status-bar error" id="validationStatus">
+                        <span class="status-indicator"></span>
+                        <span class="status-message" id="validationMessage">JSON vazio</span>
+                    </div>
+
+                    <div class="send-action-area">
+                        <button class="btn-primary btn-large" id="sendBtn" disabled>
+                            <span class="btn-text">Enviar para o Webhook</span>
+                            <div class="spinner" id="btnSpinner"></div>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Response Panel -->
+                <section class="panel response-panel">
+                    <div class="panel-header">
+                        <div class="panel-title-group">
+                            <span class="panel-icon">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                            </span>
+                            <h3>Retorno do Servidor</h3>
+                        </div>
+                        <div class="response-meta" id="responseMeta" style="display: none;">
+                            <span class="badge" id="statusBadge">200 OK</span>
+                            <span class="meta-item" id="timeElapsed">120ms</span>
+                        </div>
+                    </div>
+
+                    <div class="response-body-container">
+                        <div class="response-placeholder" id="responsePlaceholder">
+                            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            <p>Envie o JSON para visualizar a resposta do n8n aqui.</p>
+                        </div>
+                        <pre class="response-code-display" id="responseCodeDisplay" style="display: none;"><code id="responseCode"></code></pre>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
